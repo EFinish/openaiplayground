@@ -1,28 +1,60 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"os"
 
-	openai "github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
+	"github.com/manifoldco/promptui"
+)
+
+const (
+	COMMAND_BEGIN_CHAT = "begin a new chat session"
+	COMMAND_EXIT       = "exit"
+
+	STARLINE = "**********\n"
+
+	ColorReset = "\033[0m"
+	ColorRed   = "\033[31m"
+	ColorGreen = "\033[32m"
+	ColorBlue  = "\033[34m"
+	ColorPink  = "\033[35m"
+
+	ColorError    = ColorRed
+	ColorUser     = ColorBlue
+	ColorMachine  = ColorGreen
+	ColorNarrator = ColorPink
 )
 
 func main() {
-	// Initialize the OpenAI client
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	client := openai.NewClient(
-		option.WithAPIKey(apiKey),
-	)
 
-	chatCompletion, err := client.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
-		Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage("Say this is a test"),
-		}),
-		Model: openai.F(openai.ChatModelGPT4o),
-	})
-	if err != nil {
-		panic(err.Error())
+	for {
+		templates := &promptui.SelectTemplates{
+			Active:   templateGenericActive,
+			Inactive: templateGenericInactive,
+		}
+
+		prompt := promptui.Select{
+			Label:     "Select one of the following commands:",
+			Items:     []string{COMMAND_BEGIN_CHAT, COMMAND_EXIT},
+			Templates: templates,
+		}
+
+		_, result, err := prompt.Run()
+
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
+
+		switch result {
+		case COMMAND_BEGIN_CHAT:
+			// TODO should probably put context in args
+			beginChat()
+		case COMMAND_EXIT:
+			os.Exit(0)
+		default:
+			fmt.Println(string(ColorReset), "Invalid command!")
+		}
+
 	}
-	println(chatCompletion.Choices[0].Message.Content)
 }
