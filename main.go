@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	COMMAND_BEGIN_CHAT = "begin a new chat session"
-	COMMAND_EXIT       = "exit"
+	COMMAND_BEGIN_CHAT          = "begin a new chat session"
+	COMMAND_CHAT_NORSK_PRACTICE = "practice norsk"
+	COMMAND_EXIT                = "exit"
 
 	STARLINE = "**********\n"
 
@@ -35,7 +36,7 @@ func main() {
 
 		prompt := promptui.Select{
 			Label:     "Select one of the following commands:",
-			Items:     []string{COMMAND_BEGIN_CHAT, COMMAND_EXIT},
+			Items:     []string{COMMAND_BEGIN_CHAT, COMMAND_CHAT_NORSK_PRACTICE, COMMAND_EXIT},
 			Templates: templates,
 		}
 
@@ -48,8 +49,9 @@ func main() {
 
 		switch result {
 		case COMMAND_BEGIN_CHAT:
-			// TODO should probably put context in args
 			beginChat()
+		case COMMAND_CHAT_NORSK_PRACTICE:
+			beginNorskPractice()
 		case COMMAND_EXIT:
 			os.Exit(0)
 		default:
